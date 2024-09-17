@@ -18,31 +18,20 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
+
   computer_name  = "hostname"
   admin_username = var.username
   admin_ssh_key {
     username   = var.username
     public_key = file("./ssh/tf-test.pub")
   }
-}
 
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "my_terraform_nsg" {
-  name                = "myNetworkSecurityGroup"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  user_data = filebase64("./installWebserver.sh")
 
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  depends_on = [
+    azurerm_network_interface_security_group_association.example
+  ]
+
 }
 
 # Create network interface
@@ -63,4 +52,5 @@ resource "azurerm_network_interface" "my_terraform_nic" {
 resource "azurerm_network_interface_security_group_association" "example" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
+
 }
