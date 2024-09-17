@@ -18,10 +18,12 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-disable_password_authentication=false
   computer_name  = "hostname"
   admin_username = var.username
-  admin_password= var.admin_password
+  admin_ssh_key {
+    username   = var.username
+    public_key = file("./tf-test.pub")
+  }
 }
 
 # Create Network Security Group and rule
