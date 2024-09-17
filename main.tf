@@ -22,7 +22,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   admin_username = var.username
   admin_ssh_key {
     username   = var.username
-    public_key = file("./tf-test.pub")
+    public_key = file("./ssh/tf-test.pub")
   }
 }
 
